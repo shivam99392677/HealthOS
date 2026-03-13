@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 import { User, Mail, Lock, Calendar, Users, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { FIREBASE_ENABLED, auth } from '../lib/firebase';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import api from '../services/api';
 import { toast } from 'sonner';
 import GlassCard from '../components/GlassCard';
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -56,20 +56,19 @@ const Register = () => {
         toast.success('Registration successful!');
         navigate('/dashboard');
       } else {
-        // Mock registration
-        const response = await api.register(formData);
-        login(
-          {
-            uid: response.uid,
-            name: formData.name,
-            email: formData.email,
-            age: formData.age,
-            gender: formData.gender,
-          },
-          response.token
+        // registration
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
         );
-        toast.success('Registration successful!');
-        navigate('/dashboard');
+
+        const token = await userCredential.user.getIdToken();
+
+        login(userCredential.user, token);
+
+        toast.success("Registration successful!");
+        navigate("/dashboard");
       }
     } catch (err) {
       console.error('Registration error:', err);

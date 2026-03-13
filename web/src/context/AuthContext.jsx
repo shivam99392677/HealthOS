@@ -23,9 +23,18 @@ export const AuthProvider = ({ children }) => {
       const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
         if (firebaseUser) {
           const idToken = await firebaseUser.getIdToken();
-          setUser(firebaseUser);
+
+          const userData = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            name: firebaseUser.displayName
+          };
+
+          setUser(userData);
           setToken(idToken);
+
           localStorage.setItem('authToken', idToken);
+          localStorage.setItem('user', JSON.stringify(userData));
         } else {
           setUser(null);
           setToken(null);
@@ -39,7 +48,7 @@ export const AuthProvider = ({ children }) => {
       // Mock authentication
       const storedToken = localStorage.getItem('authToken');
       const storedUser = localStorage.getItem('user');
-      
+
       if (storedToken && storedUser) {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));

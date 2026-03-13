@@ -29,32 +29,28 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      if (FIREBASE_ENABLED) {
-        // Firebase authentication
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          formData.email,
-          formData.password
-        );
-        const token = await userCredential.user.getIdToken();
-        login(userCredential.user, token);
-        toast.success('Login successful!');
-        navigate('/dashboard');
-      } else {
-        // Mock authentication
-        const response = await api.login(formData);
-        login(response.user, response.token);
-        toast.success('Login successful!');
-        navigate('/dashboard');
-      }
+
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+
+      const token = await userCredential.user.getIdToken();
+
+      login(userCredential.user, token);
+
+      toast.success("Login successful!");
+      navigate("/dashboard");
+
     } catch (err) {
-      console.error('Login error:', err);
-      setError(err.response?.data?.detail || err.message || 'Login failed');
-      toast.error('Login failed. Please check your credentials.');
+      console.error("Login error:", err);
+      setError(err.message || "Login failed");
+      toast.error("Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
     }

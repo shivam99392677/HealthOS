@@ -3,6 +3,16 @@ import axios from "axios";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem("authToken");
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
 const getAuthHeader = () => {
   const token = localStorage.getItem('authToken');
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -65,9 +75,10 @@ export const api = {
   },
 
   // Upload Audio
-  uploadAudio: async (file) => {
+  uploadAudio: async (file, transcript) => {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
+    formData.append("transcript", transcript);
 
     const response = await axios.post(`${API}/upload-audio`, formData, {
       headers: {
