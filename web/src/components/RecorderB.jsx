@@ -9,9 +9,10 @@ const Recorder = ({ onRecordingComplete }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
   const mediaRecorderRef = useRef(null);
+  const recognitionRef = useRef(null);
   const transcriptRef = useRef(null);
-  const [liveTranscript, setLiveTranscript] = useState([]); const chunksRef = useRef([]);
-
+  const [liveTranscript, setLiveTranscript] = useState([]);
+  const chunksRef = useRef([]);
 
   useEffect(() => {
     if (transcriptRef.current) {
@@ -44,19 +45,17 @@ const Recorder = ({ onRecordingComplete }) => {
 
       mediaRecorder.start();
 
-      // ------------------------
-      // LIVE SPEECH TRANSCRIPT
-      // ------------------------
-
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
 
       if (SpeechRecognition) {
+
         const recognition = new SpeechRecognition();
+        recognitionRef.current = recognition;
 
         recognition.continuous = true;
         recognition.interimResults = true;
-        recognition.lang = "hi-IN";
+        recognition.lang = "en-IN";
 
         recognition.onresult = (event) => {
           for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -70,11 +69,18 @@ const Recorder = ({ onRecordingComplete }) => {
           }
         };
 
+        recognition.onend = () => {
+          if (isRecording) {
+            recognition.start();
+          }
+        };
+
         recognition.start();
       }
 
       setIsRecording(true);
       toast.success("Recording started");
+
     } catch (error) {
       console.error("Error starting recording:", error);
       toast.error("Microphone access required");
@@ -84,6 +90,11 @@ const Recorder = ({ onRecordingComplete }) => {
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
+
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+
       setIsRecording(false);
       toast.info('Recording stopped. Click upload to process.');
     }
@@ -159,8 +170,6 @@ const Recorder = ({ onRecordingComplete }) => {
         )}
       </motion.button>
 
-
-      {/* Recording Status */}
       <div className="text-center">
         <p className="text-lg font-medium text-slate-300">
           {isRecording ? 'Recording...' : audioBlob ? 'Ready to upload' : 'Click to start recording'}
@@ -170,8 +179,6 @@ const Recorder = ({ onRecordingComplete }) => {
         </p>
       </div>
 
-
-      {/* LIVE TRANSCRIPT SECTION */}
       {isRecording && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -199,7 +206,6 @@ const Recorder = ({ onRecordingComplete }) => {
           </div>
         </motion.div>
       )}
-
 
       <AnimatePresence>
         {audioBlob && !isRecording && (

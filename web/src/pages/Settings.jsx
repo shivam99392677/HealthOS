@@ -91,7 +91,7 @@ const Settings = () => {
       <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 ml-[280px] p-8">
+      <div className="flex-1 p-8">
         <div className="max-w-3xl mx-auto">
           {/* Header */}
           <motion.div
@@ -221,7 +221,7 @@ const Settings = () => {
             <h3 className="text-lg font-heading font-semibold text-white mb-4">About HealthOS</h3>
             <div className="space-y-2 text-sm text-slate-400">
               <p>Version: 1.0.0</p>
-              <p>Mode: {process.env.REACT_APP_FIREBASE_API_KEY ? 'Firebase' : 'Development (Mock)'}</p>
+              <p>Mode: {import.meta.env.VITE_FIREBASE_API_KEY ? 'Firebase' : 'Development (Mock)'}</p>
               <p className="text-xs text-slate-500 mt-4">
                 Note: Audio transcription and SOAP generation will be available once ML pipeline is integrated.
               </p>

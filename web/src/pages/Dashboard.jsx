@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Trash2, Plus } from 'lucide-react';
+import { FileText, Trash2, Plus, Play, Pause } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import GlassCard from '../components/GlassCard';
 import api from '../services/api';
@@ -22,6 +22,11 @@ const Dashboard = () => {
     assessment: '',
     plan: '',
   });
+  const audioRef = useRef(null);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -66,9 +71,10 @@ const Dashboard = () => {
     try {
       await api.deleteReport(reportId);
       toast.success('Report deleted successfully');
-      setReports(reports.filter((r) => r.id !== reportId));
+      const updatedReports = reports.filter((r) => r.id !== reportId);
+      setReports(updatedReports);
       if (selectedReport?.id === reportId) {
-        setSelectedReport(reports.length > 1 ? reports[0] : null);
+        setSelectedReport(updatedReports.length > 0 ? updatedReports[0] : null);
       }
     } catch (error) {
       console.error('Error deleting report:', error);
@@ -107,6 +113,12 @@ const Dashboard = () => {
       </div>
     );
   }
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 flex" data-testid="dashboard">
@@ -151,6 +163,7 @@ const Dashboard = () => {
                     {new Date(selectedReport.created_at).toLocaleString()}
                   </p>
                 </div>
+
                 <button
                   onClick={() => handleDeleteReport(selectedReport.id)}
                   className="p-2 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
@@ -161,7 +174,63 @@ const Dashboard = () => {
               </div>
 
               <div className="space-y-6">
-                {/* Subjective */}
+                {/* Audio Player */}
+                {selectedReport.audio_url && (
+                  <div>
+                    <h3 className="text-xl font-heading font-semibold text-cyan-400 mb-3 flex items-center">
+                      <span className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center mr-3 text-sm">
+                        ▶
+                      </span>
+                      Consultation Audio
+                    </h3>
+
+                    <div className="bg-slate-900 rounded-lg p-4 border border-slate-800 w-full">
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={() => {
+                            if (audioRef.current.paused) {
+                              audioRef.current.play();
+                              setIsPlaying(true);
+                            } else {
+                              audioRef.current.pause();
+                              setIsPlaying(false);
+                            }
+                          }}
+                          className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 text-slate-950 hover:scale-105 transition"
+                        >
+                          {isPlaying ? <Pause size={18} /> : <Play size={18} />}
+                        </button>
+
+                        <div className="flex-1">
+                          <input
+                            type="range"
+                            min="0"
+                            max={duration || 0}
+                            value={currentTime}
+                            onChange={(e) => {
+                              audioRef.current.currentTime = e.target.value;
+                              setCurrentTime(e.target.value);
+                            }}
+                            className="w-full accent-cyan-500"
+                          />
+                          <div className="flex justify-between text-xs text-slate-500 mt-1">
+                            <span>{formatTime(currentTime)}</span>
+                            <span>{formatTime(duration)}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <audio
+                        ref={audioRef}
+                        src={selectedReport.audio_url}
+                        onTimeUpdate={() => setCurrentTime(audioRef.current.currentTime)}
+                        onLoadedMetadata={() => setDuration(audioRef.current.duration)}
+                        onEnded={() => setIsPlaying(false)}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* SOAP Sections */}
                 <div data-testid="soap-subjective">
                   <h3 className="text-xl font-heading font-semibold text-cyan-400 mb-3 flex items-center">
                     <span className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center mr-3 text-sm">S</span>
@@ -172,7 +241,6 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* Objective */}
                 <div data-testid="soap-objective">
                   <h3 className="text-xl font-heading font-semibold text-purple-400 mb-3 flex items-center">
                     <span className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center mr-3 text-sm">O</span>
@@ -183,7 +251,6 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* Assessment */}
                 <div data-testid="soap-assessment">
                   <h3 className="text-xl font-heading font-semibold text-pink-400 mb-3 flex items-center">
                     <span className="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center mr-3 text-sm">A</span>
@@ -194,7 +261,6 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* Plan */}
                 <div data-testid="soap-plan">
                   <h3 className="text-xl font-heading font-semibold text-cyan-400 mb-3 flex items-center">
                     <span className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center mr-3 text-sm">P</span>
@@ -214,20 +280,9 @@ const Dashboard = () => {
               </div>
             </GlassCard>
           ) : (
-            <GlassCard className="min-h-[600px] flex flex-col items-center justify-center" data-testid="empty-state">
-              <FileText size={64} className="text-slate-700 mb-4" />
-              <h3 className="text-xl font-heading font-semibold text-slate-400 mb-2">
-                No reports yet
-              </h3>
-              <p className="text-slate-500 mb-6">Create your first clinical report to get started</p>
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="flex items-center space-x-2 px-6 py-3 rounded-full bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400 glow-cyan glow-cyan-hover transition-all"
-              >
-                <Plus size={20} />
-                <span>Create Report</span>
-              </button>
-            </GlassCard>
+            <div className="flex items-center justify-center h-[400px] text-slate-500 border border-dashed border-slate-800 rounded-2xl">
+              Select a report from the sidebar to view details
+            </div>
           )}
         </div>
       </div>
@@ -248,7 +303,7 @@ const Dashboard = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              className="glass rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-slate-900 border border-slate-800"
             >
               <h2 className="text-2xl font-heading font-bold text-white mb-6">Create New Report</h2>
               <form onSubmit={handleAddReport} className="space-y-4">

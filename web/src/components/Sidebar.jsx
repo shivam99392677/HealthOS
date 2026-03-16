@@ -41,9 +41,13 @@ const Sidebar = ({ reports = [], onReportSelect, selectedReportId }) => {
               exit={{ opacity: 0 }}
               className="flex items-center space-x-2"
             >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 flex items-center justify-center">
-                <span className="text-slate-950 font-heading font-bold">H</span>
-              </div>
+              <Link to="/" className="flex items-center space-x-2">
+                <img
+                  src="/favicon.svg"
+                  alt="HealthOS Logo"
+                  className="w-8 h-8"
+                />
+              </Link>
               <span className="text-lg font-heading font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
                 HealthOS
               </span>
@@ -66,11 +70,10 @@ const Sidebar = ({ reports = [], onReportSelect, selectedReportId }) => {
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                isActive(item.path)
-                  ? 'text-cyan-400 bg-cyan-500/10 border-r-2 border-cyan-500'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive(item.path)
+                ? 'text-cyan-400 bg-cyan-500/10 border-r-2 border-cyan-500'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                }`}
               data-testid={item.testId}
             >
               <item.icon size={20} />
@@ -102,11 +105,10 @@ const Sidebar = ({ reports = [], onReportSelect, selectedReportId }) => {
                   <button
                     key={report.id}
                     onClick={() => onReportSelect(report.id)}
-                    className={`w-full text-left px-4 py-2 rounded-lg transition-all ${
-                      selectedReportId === report.id
-                        ? 'bg-purple-500/10 text-purple-400'
-                        : 'text-slate-400 hover:bg-white/5 hover:text-white'
-                    }`}
+                    className={`w-full text-left px-4 py-2 rounded-lg transition-all ${selectedReportId === report.id
+                      ? 'bg-purple-500/10 text-purple-400'
+                      : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                      }`}
                     data-testid={`report-item-${report.id}`}
                   >
                     <p className="text-sm font-medium truncate">{report.title}</p>

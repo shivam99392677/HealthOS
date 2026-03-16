@@ -13,6 +13,8 @@ from datetime import datetime, timezone
 import firebase_admin
 from firebase_admin import credentials, auth as firebase_auth, firestore, storage
 import bcrypt
+import requests
+import asyncio
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
@@ -139,6 +141,38 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ml pipeline
+async def process_ml_pipeline(report_id: str, transcript: str):
+    try:
+
+        # Call ML service
+        response = requests.post(
+            "http://localhost:8001/generate-soap",
+            json={"transcript": transcript},
+            timeout=60,
+        )
+
+        result = response.json()
+
+        # Update Firestore with ML result
+        firestore_client.collection("reports").document(report_id).update(
+            {
+                "subjective": result.get("subjective", ""),
+                "objective": result.get("objective", ""),
+                "assessment": result.get("assessment", ""),
+                "plan": result.get("plan", ""),
+                "ml_status": "completed",
+            }
+        )
+
+    except Exception as e:
+        print("ML ERROR:", e)
+
+        firestore_client.collection("reports").document(report_id).update(
+            {"ml_status": "failed"}
+        )
 
 
 # Routes
@@ -430,6 +464,9 @@ async def upload_audio(
 
         # Save to Firestore
         firestore_client.collection("reports").document(doc["id"]).set(doc)
+
+        # send transcript to ML pipeline asynchronously
+        asyncio.create_task(process_ml_pipeline(doc["id"], transcript))
 
         return {
             "message": "Audio uploaded successfully",

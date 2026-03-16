@@ -7,7 +7,7 @@ import { FIREBASE_ENABLED, auth } from '../lib/firebase';
 import api from '../services/api';
 import { toast } from 'sonner';
 import GlassCard from '../components/GlassCard';
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 const Register = () => {
   const navigate = useNavigate();

@@ -25,9 +25,13 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center space-x-2" data-testid="nav-logo">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 flex items-center justify-center glow-cyan">
-              <span className="text-slate-950 font-heading font-bold text-xl">H</span>
-            </div>
+            <Link to="/" className="flex items-center space-x-2">
+              <img
+                src="/favicon.svg"
+                alt="HealthOS Logo"
+                className="w-8 h-8"
+              />
+            </Link>
             <span className="text-2xl font-heading font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
               HealthOS
             </span>
@@ -38,11 +42,10 @@ const Navbar = () => {
               <>
                 <Link
                   to="/"
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all ${
-                    isActive('/') 
-                      ? 'bg-cyan-500/20 text-cyan-400' 
-                      : 'text-slate-400 hover:text-white hover:bg-white/5'
-                  }`}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all ${isActive('/')
+                    ? 'bg-cyan-500/20 text-cyan-400'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                    }`}
                   data-testid="nav-home"
                 >
                   <Home size={18} />
@@ -50,11 +53,10 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/dashboard"
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all ${
-                    isActive('/dashboard') 
-                      ? 'bg-cyan-500/20 text-cyan-400' 
-                      : 'text-slate-400 hover:text-white hover:bg-white/5'
-                  }`}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all ${isActive('/dashboard')
+                    ? 'bg-cyan-500/20 text-cyan-400'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                    }`}
                   data-testid="nav-dashboard"
                 >
                   <LayoutDashboard size={18} />
@@ -62,11 +64,10 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/settings"
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all ${
-                    isActive('/settings') 
-                      ? 'bg-cyan-500/20 text-cyan-400' 
-                      : 'text-slate-400 hover:text-white hover:bg-white/5'
-                  }`}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all ${isActive('/settings')
+                    ? 'bg-cyan-500/20 text-cyan-400'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                    }`}
                   data-testid="nav-settings"
                 >
                   <Settings size={18} />

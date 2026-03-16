@@ -1,0 +1,28 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <linearGradient id="healthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"></stop>
+      <stop offset="100%" stop-color="#9333ea"></stop>
+    </linearGradient>
+  </defs>
+
+  <!-- Circle Background -->
+  <circle cx="128" cy="128" r="110" fill="url(#healthGradient)"></circle>
+
+  <!-- Medical Cross -->
+  <rect x="110" y="60" width="36" height="136" fill="white"></rect>
+  <rect x="60" y="110" width="136" height="36" fill="white"></rect>
+
+  <!-- AI Circuit Lines -->
+  <g stroke="white" stroke-width="6" stroke-linecap="round">
+    <line x1="160" y1="100" x2="210" y2="80"></line>
+    <line x1="160" y1="128" x2="220" y2="128"></line>
+    <line x1="160" y1="156" x2="210" y2="176"></line>
+  </g>
+
+  <circle cx="220" cy="128" r="6" fill="white"></circle>
+  <circle cx="210" cy="80" r="6" fill="white"></circle>
+  <circle cx="210" cy="176" r="6" fill="white"></circle>
+
+</svg>
