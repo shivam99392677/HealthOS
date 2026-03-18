@@ -4,6 +4,10 @@
 
 ---
 
+## Video
+
+https://github.com/user-attachments/assets/1d2b470b-7377-4a80-b0e0-863ac9bc700d
+
 ## 🌟 Overview
 
 **HealthOS** is a full-stack, AI-powered clinical documentation platform that listens to real-time doctor–patient conversations and automatically generates structured medical records — so doctors can focus on patients, not paperwork.
